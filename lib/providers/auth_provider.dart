@@ -41,7 +41,8 @@ class AuthProvider extends ChangeNotifier {
 
       return true;
     } catch (error) {
-      _errorMessage = 'E-mail ou senha inválidos.';
+      debugPrint('Erro no login: $error');
+      _errorMessage = 'Erro ao fazer login.';
       return false;
     } finally {
       _isLoading = false;

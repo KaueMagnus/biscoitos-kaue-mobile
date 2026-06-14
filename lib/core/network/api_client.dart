@@ -23,10 +23,14 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await _tokenStorage.getToken();
+          final isLoginRequest = options.path == '/auth/login';
 
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
+          if (!isLoginRequest) {
+            final token = await _tokenStorage.getToken();
+
+            if (token != null && token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
 
           return handler.next(options);

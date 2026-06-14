@@ -4,10 +4,16 @@ import 'package:provider/provider.dart';
 import 'core/network/api_client.dart';
 import 'core/storage/token_storage.dart';
 import 'providers/auth_provider.dart';
+import 'providers/cliente_provider.dart';
+import 'providers/produto_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'services/auth_service.dart';
+import 'services/cliente_service.dart';
+import 'services/produto_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final tokenStorage = TokenStorage();
   final dio = ApiClient(tokenStorage).createDio();
 
@@ -18,10 +24,26 @@ void main() {
         Provider<AuthService>(
           create: (_) => AuthService(dio),
         ),
+        Provider<ClienteService>(
+          create: (_) => ClienteService(dio),
+        ),
+        Provider<ProdutoService>(
+          create: (_) => ProdutoService(dio),
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
             authService: context.read<AuthService>(),
             tokenStorage: context.read<TokenStorage>(),
+          ),
+        ),
+        ChangeNotifierProvider<ClienteProvider>(
+          create: (context) => ClienteProvider(
+            clienteService: context.read<ClienteService>(),
+          ),
+        ),
+        ChangeNotifierProvider<ProdutoProvider>(
+          create: (context) => ProdutoProvider(
+            produtoService: context.read<ProdutoService>(),
           ),
         ),
       ],
