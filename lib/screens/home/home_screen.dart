@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../clientes/clientes_screen.dart';
 import '../produtos/produtos_screen.dart';
+import '../pedidos/novo_pedido_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,6 +19,14 @@ class HomeScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const ProdutosScreen(),
+      ),
+    );
+  }
+
+  void _abrirNovoPedido(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const NovoPedidoScreen(),
       ),
     );
   }
@@ -50,6 +59,11 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => _abrirProdutos(context),
               child: const Text('Produtos'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => _abrirNovoPedido(context),
+              child: const Text('Novo pedido'),
             ),
           ],
         ),

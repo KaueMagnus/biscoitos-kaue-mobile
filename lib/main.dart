@@ -10,6 +10,8 @@ import 'screens/auth/login_screen.dart';
 import 'services/auth_service.dart';
 import 'services/cliente_service.dart';
 import 'services/produto_service.dart';
+import 'providers/pedido_provider.dart';
+import 'services/pedido_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +32,9 @@ void main() async {
         Provider<ProdutoService>(
           create: (_) => ProdutoService(dio),
         ),
+        Provider<PedidoService>(
+          create: (_) => PedidoService(dio),
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
             authService: context.read<AuthService>(),
@@ -44,6 +49,11 @@ void main() async {
         ChangeNotifierProvider<ProdutoProvider>(
           create: (context) => ProdutoProvider(
             produtoService: context.read<ProdutoService>(),
+          ),
+        ),
+        ChangeNotifierProvider<PedidoProvider>(
+          create: (context) => PedidoProvider(
+            pedidoService: context.read<PedidoService>(),
           ),
         ),
       ],
