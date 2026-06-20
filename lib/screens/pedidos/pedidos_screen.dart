@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/pedido.dart';
 import '../../providers/pedido_provider.dart';
+import 'detalhe_pedido_screen.dart';
 
 class PedidosScreen extends StatefulWidget {
   const PedidosScreen({super.key});
@@ -38,6 +39,14 @@ class _PedidosScreenState extends State<PedidosScreen> {
     return 'R\$ ${valor.toStringAsFixed(2)}';
   }
 
+  void _abrirDetalhePedido(Pedido pedido) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DetalhePedidoScreen(pedidoId: pedido.id),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final pedidoProvider = context.watch<PedidoProvider>();
@@ -70,6 +79,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
                   pedido: pedido,
                   dataFormatada: _formatarData(pedido.dataCriacao),
                   valorFormatado: _formatarValor(pedido.valorTotal),
+                  onTap: () => _abrirDetalhePedido(pedido),
                 );
               },
             ),
@@ -84,44 +94,49 @@ class _PedidoCard extends StatelessWidget {
   final Pedido pedido;
   final String dataFormatada;
   final String valorFormatado;
+  final VoidCallback onTap;
 
   const _PedidoCard({
     required this.pedido,
     required this.dataFormatada,
     required this.valorFormatado,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Pedido #${pedido.id}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Pedido #${pedido.id}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  valorFormatado,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(pedido.clienteNome),
-            const SizedBox(height: 8),
-            Text('Tipo: ${pedido.tipo}'),
-            Text('Status: ${pedido.status}'),
-            Text('Data: $dataFormatada'),
-          ],
+                  Text(
+                    valorFormatado,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(pedido.clienteNome),
+              const SizedBox(height: 8),
+              Text('Tipo: ${pedido.tipo}'),
+              Text('Status: ${pedido.status}'),
+              Text('Data: $dataFormatada'),
+            ],
+          ),
         ),
       ),
     );

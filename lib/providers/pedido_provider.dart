@@ -13,13 +13,19 @@ class PedidoProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   bool _isLoadingLista = false;
+  bool _isLoadingDetalhe = false;
   String? _errorMessage;
+  String? _errorMessageDetalhe;
   List<Pedido> _pedidos = [];
+  Pedido? _pedidoDetalhe;
 
   bool get isLoading => _isLoading;
   bool get isLoadingLista => _isLoadingLista;
+  bool get isLoadingDetalhe => _isLoadingDetalhe;
   String? get errorMessage => _errorMessage;
+  String? get errorMessageDetalhe => _errorMessageDetalhe;
   List<Pedido> get pedidos => _pedidos;
+  Pedido? get pedidoDetalhe => _pedidoDetalhe;
 
   Future<void> carregarPedidos() async {
     _isLoadingLista = true;
@@ -33,6 +39,23 @@ class PedidoProvider extends ChangeNotifier {
       _errorMessage = 'Erro ao carregar pedidos.';
     } finally {
       _isLoadingLista = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> carregarPedidoPorId(int id) async {
+    _isLoadingDetalhe = true;
+    _errorMessageDetalhe = null;
+    _pedidoDetalhe = null;
+    notifyListeners();
+
+    try {
+      _pedidoDetalhe = await _pedidoService.buscarPedidoPorId(id);
+    } catch (error) {
+      debugPrint('Erro ao carregar detalhe do pedido: $error');
+      _errorMessageDetalhe = 'Erro ao carregar detalhe do pedido.';
+    } finally {
+      _isLoadingDetalhe = false;
       notifyListeners();
     }
   }

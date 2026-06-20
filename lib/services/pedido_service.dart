@@ -19,4 +19,10 @@ class PedidoService {
 
     return data.map((pedidoJson) => Pedido.fromJson(pedidoJson)).toList();
   }
+
+  Future<Pedido> buscarPedidoPorId(int id) async {
+    final response = await _dio.get('/pedidos/$id');
+
+    return Pedido.fromJson(response.data);
+  }
 }

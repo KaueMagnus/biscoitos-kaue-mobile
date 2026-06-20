@@ -1,17 +1,27 @@
 class Pedido {
   final int id;
+  final int? clienteId;
   final String clienteNome;
+  final int? usuarioId;
+  final String? usuarioNome;
   final String tipo;
   final String status;
+  final String? observacao;
+  final String? motivoTroca;
   final double valorTotal;
   final DateTime? dataCriacao;
   final List<ItemPedidoResponse> itens;
 
   Pedido({
     required this.id,
+    this.clienteId,
     required this.clienteNome,
+    this.usuarioId,
+    this.usuarioNome,
     required this.tipo,
     required this.status,
+    this.observacao,
+    this.motivoTroca,
     required this.valorTotal,
     required this.dataCriacao,
     required this.itens,
@@ -22,9 +32,14 @@ class Pedido {
 
     return Pedido(
       id: json['id'],
+      clienteId: json['clienteId'],
       clienteNome: _lerNomeCliente(json),
+      usuarioId: json['usuarioId'],
+      usuarioNome: json['nomeUsuario'],
       tipo: json['tipo'] ?? '',
       status: json['status'] ?? '',
+      observacao: json['observacao'],
+      motivoTroca: json['motivoTroca'],
       valorTotal: (json['valorTotal'] as num?)?.toDouble() ?? 0,
       dataCriacao: DateTime.tryParse(json['dataCriacao'] ?? ''),
       itens: itensJson
@@ -83,6 +98,10 @@ class ItemPedidoResponse {
   }
 
   static String _lerNomeProduto(Map<String, dynamic> json) {
+    if (json['nomeProduto'] != null) {
+      return json['nomeProduto'];
+    }
+
     if (json['produtoNome'] != null) {
       return json['produtoNome'];
     }
