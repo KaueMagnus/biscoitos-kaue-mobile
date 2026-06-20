@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../models/cliente.dart';
+import '../models/cliente_request.dart';
 
 class ClienteService {
   final Dio _dio;
@@ -12,8 +13,10 @@ class ClienteService {
 
     final data = response.data as List;
 
-    return data
-        .map((clienteJson) => Cliente.fromJson(clienteJson))
-        .toList();
+    return data.map((clienteJson) => Cliente.fromJson(clienteJson)).toList();
+  }
+
+  Future<void> cadastrarCliente(ClienteRequest cliente) async {
+    await _dio.post('/clientes', data: cliente.toJson());
   }
 }
