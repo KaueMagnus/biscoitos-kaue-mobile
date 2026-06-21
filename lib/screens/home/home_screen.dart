@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../providers/auth_provider.dart';
+import '../auth/login_screen.dart';
 import '../clientes/clientes_screen.dart';
 import '../produtos/produtos_screen.dart';
 import '../pedidos/novo_pedido_screen.dart';
@@ -32,10 +35,31 @@ class HomeScreen extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (_) => const PedidosScreen()));
   }
 
+  Future<void> _sair(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    final authProvider = context.read<AuthProvider>();
+
+    await authProvider.logout();
+
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Biscoitos Kauê'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Biscoitos Kauê'),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () => _sair(context),
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
