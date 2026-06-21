@@ -13,6 +13,18 @@ class PedidosScreen extends StatefulWidget {
 }
 
 class _PedidosScreenState extends State<PedidosScreen> {
+  static const _opcaoTodos = 'TODOS';
+  static const _statusOptions = [
+    _opcaoTodos,
+    'PENDENTE',
+    'ENVIADO',
+    'CANCELADO',
+  ];
+  static const _tipoOptions = [_opcaoTodos, 'NORMAL', 'TROCA'];
+
+  String _statusSelecionado = _opcaoTodos;
+  String _tipoSelecionado = _opcaoTodos;
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +59,23 @@ class _PedidosScreenState extends State<PedidosScreen> {
     );
   }
 
+  bool _pedidoPassaNosFiltros(Pedido pedido) {
+    final statusOk =
+        _statusSelecionado == _opcaoTodos ||
+        pedido.status.toUpperCase() == _statusSelecionado;
+    final tipoOk =
+        _tipoSelecionado == _opcaoTodos ||
+        pedido.tipo.toUpperCase() == _tipoSelecionado;
+
+    return statusOk && tipoOk;
+  }
+
   @override
   Widget build(BuildContext context) {
     final pedidoProvider = context.watch<PedidoProvider>();
+    final pedidosFiltrados = pedidoProvider.pedidos
+        .where(_pedidoPassaNosFiltros)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Pedidos')),
@@ -69,19 +95,74 @@ class _PedidosScreenState extends State<PedidosScreen> {
 
           return RefreshIndicator(
             onRefresh: pedidoProvider.carregarPedidos,
-            child: ListView.builder(
+            child: ListView(
               padding: const EdgeInsets.all(12),
-              itemCount: pedidoProvider.pedidos.length,
-              itemBuilder: (context, index) {
-                final pedido = pedidoProvider.pedidos[index];
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _statusSelecionado,
+                        decoration: const InputDecoration(
+                          labelText: 'Status',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: _statusOptions.map((status) {
+                          return DropdownMenuItem(
+                            value: status,
+                            child: Text(status),
+                          );
+                        }).toList(),
+                        onChanged: (status) {
+                          if (status == null) return;
 
-                return _PedidoCard(
-                  pedido: pedido,
-                  dataFormatada: _formatarData(pedido.dataCriacao),
-                  valorFormatado: _formatarValor(pedido.valorTotal),
-                  onTap: () => _abrirDetalhePedido(pedido),
-                );
-              },
+                          setState(() {
+                            _statusSelecionado = status;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _tipoSelecionado,
+                        decoration: const InputDecoration(
+                          labelText: 'Tipo',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: _tipoOptions.map((tipo) {
+                          return DropdownMenuItem(
+                            value: tipo,
+                            child: Text(tipo),
+                          );
+                        }).toList(),
+                        onChanged: (tipo) {
+                          if (tipo == null) return;
+
+                          setState(() {
+                            _tipoSelecionado = tipo;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (pedidosFiltrados.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 48),
+                    child: Center(child: Text('Nenhum pedido encontrado.')),
+                  )
+                else
+                  ...pedidosFiltrados.map((pedido) {
+                    return _PedidoCard(
+                      pedido: pedido,
+                      dataFormatada: _formatarData(pedido.dataCriacao),
+                      valorFormatado: _formatarValor(pedido.valorTotal),
+                      onTap: () => _abrirDetalhePedido(pedido),
+                    );
+                  }),
+              ],
             ),
           );
         },
