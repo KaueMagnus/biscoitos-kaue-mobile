@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/cliente_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/primary_button.dart';
+import '../../widgets/section_title.dart';
 
 class NovoClienteScreen extends StatefulWidget {
   const NovoClienteScreen({super.key});
@@ -89,58 +92,67 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
           key: _formKey,
           child: ListView(
             children: [
-              TextFormField(
-                controller: _nomeController,
-                decoration: const InputDecoration(
-                  labelText: 'Nome',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (valor) => _validarObrigatorio(valor, 'Nome'),
+              const SectionTitle(
+                title: 'Cadastrar cliente',
+                subtitle: 'O cliente será vinculado ao representante logado.',
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _cidadeController,
-                decoration: const InputDecoration(
-                  labelText: 'Cidade',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (valor) => _validarObrigatorio(valor, 'Cidade'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _telefoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Telefone',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'E-mail',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _documentoController,
-                decoration: const InputDecoration(
-                  labelText: 'Documento/CNPJ',
-                  border: OutlineInputBorder(),
+              AppCard(
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _nomeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nome',
+                        prefixIcon: Icon(Icons.storefront_outlined),
+                      ),
+                      validator: (valor) => _validarObrigatorio(valor, 'Nome'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _cidadeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Cidade',
+                        prefixIcon: Icon(Icons.location_city_outlined),
+                      ),
+                      validator: (valor) =>
+                          _validarObrigatorio(valor, 'Cidade'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _telefoneController,
+                      decoration: const InputDecoration(
+                        labelText: 'Telefone',
+                        prefixIcon: Icon(Icons.phone_outlined),
+                      ),
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'E-mail',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _documentoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Documento/CNPJ',
+                        prefixIcon: Icon(Icons.badge_outlined),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 24),
-              SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: clienteProvider.isLoading ? null : _salvarCliente,
-                  child: clienteProvider.isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Salvar cliente'),
-                ),
+              PrimaryButton(
+                label: 'Salvar cliente',
+                icon: Icons.save_outlined,
+                isLoading: clienteProvider.isLoading,
+                onPressed: _salvarCliente,
               ),
             ],
           ),

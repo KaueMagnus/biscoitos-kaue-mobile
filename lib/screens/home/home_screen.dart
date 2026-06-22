@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/section_title.dart';
 import '../auth/login_screen.dart';
 import '../clientes/clientes_screen.dart';
 import '../produtos/produtos_screen.dart';
@@ -54,43 +57,162 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Biscoitos Kauê'),
         centerTitle: true,
         actions: [
-          TextButton(
+          IconButton(
             onPressed: () => _sair(context),
-            child: const Text('Sair'),
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Menu principal',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryRed,
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => _abrirClientes(context),
-              child: const Text('Clientes'),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: AppTheme.gold,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.storefront_outlined,
+                    color: AppTheme.brandBlack,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Menu do representante',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Clientes, produtos e pedidos em um só lugar.',
+                        style: TextStyle(color: AppTheme.gold),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => _abrirProdutos(context),
-              child: const Text('Produtos'),
+          ),
+          const SizedBox(height: 20),
+          const SectionTitle(
+            title: 'Acessos rápidos',
+            subtitle: 'Escolha uma operação para continuar.',
+          ),
+          const SizedBox(height: 12),
+          _HomeActionCard(
+            icon: Icons.people_alt_outlined,
+            title: 'Clientes',
+            subtitle: 'Consultar e cadastrar clientes',
+            onTap: () => _abrirClientes(context),
+          ),
+          const SizedBox(height: 12),
+          _HomeActionCard(
+            icon: Icons.inventory_2_outlined,
+            title: 'Produtos',
+            subtitle: 'Ver catálogo e preços',
+            onTap: () => _abrirProdutos(context),
+          ),
+          const SizedBox(height: 12),
+          _HomeActionCard(
+            icon: Icons.add_shopping_cart,
+            title: 'Novo pedido',
+            subtitle: 'Criar pedido normal ou troca',
+            onTap: () => _abrirNovoPedido(context),
+          ),
+          const SizedBox(height: 12),
+          _HomeActionCard(
+            icon: Icons.receipt_long_outlined,
+            title: 'Pedidos',
+            subtitle: 'Acompanhar status e detalhes',
+            onTap: () => _abrirPedidos(context),
+          ),
+          const SizedBox(height: 12),
+          _HomeActionCard(
+            icon: Icons.logout,
+            title: 'Sair',
+            subtitle: 'Encerrar sessão com segurança',
+            isDestructive: true,
+            onTap: () => _sair(context),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isDestructive;
+  final VoidCallback onTap;
+
+  const _HomeActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    this.isDestructive = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isDestructive ? AppTheme.cancelRed : AppTheme.primaryRed;
+
+    return AppCard(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => _abrirNovoPedido(context),
-              child: const Text('Novo pedido'),
+            child: Icon(icon, color: color),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: AppTheme.supportGray),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => _abrirPedidos(context),
-              child: const Text('Pedidos'),
-            ),
-          ],
-        ),
+          ),
+          const Icon(Icons.chevron_right, color: AppTheme.supportGray),
+        ],
       ),
     );
   }

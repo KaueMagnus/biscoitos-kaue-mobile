@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'core/network/api_client.dart';
 import 'core/storage/token_storage.dart';
+import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cliente_provider.dart';
 import 'providers/produto_provider.dart';
@@ -23,18 +24,10 @@ void main() async {
     MultiProvider(
       providers: [
         Provider<TokenStorage>.value(value: tokenStorage),
-        Provider<AuthService>(
-          create: (_) => AuthService(dio),
-        ),
-        Provider<ClienteService>(
-          create: (_) => ClienteService(dio),
-        ),
-        Provider<ProdutoService>(
-          create: (_) => ProdutoService(dio),
-        ),
-        Provider<PedidoService>(
-          create: (_) => PedidoService(dio),
-        ),
+        Provider<AuthService>(create: (_) => AuthService(dio)),
+        Provider<ClienteService>(create: (_) => ClienteService(dio)),
+        Provider<ProdutoService>(create: (_) => ProdutoService(dio)),
+        Provider<PedidoService>(create: (_) => PedidoService(dio)),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
             authService: context.read<AuthService>(),
@@ -42,19 +35,16 @@ void main() async {
           ),
         ),
         ChangeNotifierProvider<ClienteProvider>(
-          create: (context) => ClienteProvider(
-            clienteService: context.read<ClienteService>(),
-          ),
+          create: (context) =>
+              ClienteProvider(clienteService: context.read<ClienteService>()),
         ),
         ChangeNotifierProvider<ProdutoProvider>(
-          create: (context) => ProdutoProvider(
-            produtoService: context.read<ProdutoService>(),
-          ),
+          create: (context) =>
+              ProdutoProvider(produtoService: context.read<ProdutoService>()),
         ),
         ChangeNotifierProvider<PedidoProvider>(
-          create: (context) => PedidoProvider(
-            pedidoService: context.read<PedidoService>(),
-          ),
+          create: (context) =>
+              PedidoProvider(pedidoService: context.read<PedidoService>()),
         ),
       ],
       child: const BiscoitosKaueApp(),
@@ -70,12 +60,7 @@ class BiscoitosKaueApp extends StatelessWidget {
     return MaterialApp(
       title: 'Biscoitos Kauê',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.brown,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.theme,
       home: const LoginScreen(),
     );
   }

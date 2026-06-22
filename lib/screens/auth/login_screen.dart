@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/primary_button.dart';
 import '../home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,9 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController(
     text: 'admin@biscoitoskaue.com',
   );
-  final _senhaController = TextEditingController(
-    text: '123456',
-  );
+  final _senhaController = TextEditingController(text: '123456');
 
   @override
   void dispose() {
@@ -37,11 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
-        ),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -56,53 +55,86 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Biscoitos Kauê'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      backgroundColor: AppTheme.brandBlack,
+      body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const Text(
-                  'Entrar',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 230,
+                    height: 150,
+                    child: ClipRect(
+                      child: Transform.scale(
+                        scale: 3.4,
+                        child: Image.asset(
+                          'assets/images/logo_biscoitoskaue.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'E-mail',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 14),
+                  AppCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          'Entrar',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.darkText,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'Acesse sua carteira de clientes e pedidos.',
+                          style: TextStyle(color: AppTheme.supportGray),
+                        ),
+                        const SizedBox(height: 24),
+                        TextField(
+                          controller: _emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'E-mail',
+                            prefixIcon: Icon(Icons.email_outlined),
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _senhaController,
+                          decoration: const InputDecoration(
+                            labelText: 'Senha',
+                            prefixIcon: Icon(Icons.lock_outline),
+                          ),
+                          obscureText: true,
+                        ),
+                        const SizedBox(height: 24),
+                        PrimaryButton(
+                          label: 'Entrar',
+                          icon: Icons.login,
+                          isLoading: authProvider.isLoading,
+                          onPressed: _login,
+                        ),
+                      ],
+                    ),
                   ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _senhaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 18),
+                  const Text(
+                    'Biscoitos Kauê',
+                    style: TextStyle(
+                      color: AppTheme.gold,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0,
+                    ),
                   ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: authProvider.isLoading ? null : _login,
-                    child: authProvider.isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Entrar'),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

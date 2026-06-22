@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../models/cliente.dart';
 import '../../providers/cliente_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/section_title.dart';
 import 'novo_cliente_screen.dart';
 
 class ClientesScreen extends StatefulWidget {
@@ -102,36 +105,87 @@ class _ClientesScreenState extends State<ClientesScreen> {
             return const Center(child: Text('Nenhum cliente encontrado.'));
           }
 
-          return Column(
+          return ListView(
+            padding: const EdgeInsets.all(16),
             children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  controller: _buscaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar cliente',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (_) => _atualizarBusca(),
+              const SectionTitle(
+                title: 'Clientes',
+                subtitle: 'Busque por nome, cidade ou documento.',
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _buscaController,
+                decoration: const InputDecoration(
+                  labelText: 'Buscar cliente',
+                  prefixIcon: Icon(Icons.search),
                 ),
+                onChanged: (_) => _atualizarBusca(),
               ),
-              Expanded(
-                child: clientesFiltrados.isEmpty
-                    ? const Center(child: Text('Nenhum cliente encontrado.'))
-                    : ListView.builder(
-                        itemCount: clientesFiltrados.length,
-                        itemBuilder: (context, index) {
-                          final cliente = clientesFiltrados[index];
-
-                          return ListTile(
-                            title: Text(cliente.nome),
-                            subtitle: Text(cliente.cidade),
-                            trailing: const Icon(Icons.chevron_right),
-                          );
-                        },
+              const SizedBox(height: 12),
+              if (clientesFiltrados.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 48),
+                  child: Center(child: Text('Nenhum cliente encontrado.')),
+                )
+              else
+                ...clientesFiltrados.map((cliente) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: AppCard(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryRed.withValues(
+                                alpha: 0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.storefront_outlined,
+                              color: AppTheme.primaryRed,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  cliente.nome,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  cliente.cidade,
+                                  style: const TextStyle(
+                                    color: AppTheme.supportGray,
+                                  ),
+                                ),
+                                if (cliente.documento != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    cliente.documento!,
+                                    style: const TextStyle(
+                                      color: AppTheme.caramel,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-              ),
+                    ),
+                  );
+                }),
             ],
           );
         },

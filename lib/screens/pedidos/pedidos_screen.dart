@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../models/pedido.dart';
 import '../../providers/pedido_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/section_title.dart';
+import '../../widgets/status_badge.dart';
 import 'detalhe_pedido_screen.dart';
 
 class PedidosScreen extends StatefulWidget {
@@ -96,56 +100,59 @@ class _PedidosScreenState extends State<PedidosScreen> {
           return RefreshIndicator(
             onRefresh: pedidoProvider.carregarPedidos,
             child: ListView(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue: _statusSelecionado,
-                        decoration: const InputDecoration(
-                          labelText: 'Status',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: _statusOptions.map((status) {
-                          return DropdownMenuItem(
-                            value: status,
-                            child: Text(status),
-                          );
-                        }).toList(),
-                        onChanged: (status) {
-                          if (status == null) return;
+                const SectionTitle(
+                  title: 'Pedidos',
+                  subtitle: 'Filtre por status ou tipo do pedido.',
+                ),
+                const SizedBox(height: 12),
+                AppCard(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: _statusSelecionado,
+                          decoration: const InputDecoration(
+                            labelText: 'Status',
+                          ),
+                          items: _statusOptions.map((status) {
+                            return DropdownMenuItem(
+                              value: status,
+                              child: Text(status),
+                            );
+                          }).toList(),
+                          onChanged: (status) {
+                            if (status == null) return;
 
-                          setState(() {
-                            _statusSelecionado = status;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue: _tipoSelecionado,
-                        decoration: const InputDecoration(
-                          labelText: 'Tipo',
-                          border: OutlineInputBorder(),
+                            setState(() {
+                              _statusSelecionado = status;
+                            });
+                          },
                         ),
-                        items: _tipoOptions.map((tipo) {
-                          return DropdownMenuItem(
-                            value: tipo,
-                            child: Text(tipo),
-                          );
-                        }).toList(),
-                        onChanged: (tipo) {
-                          if (tipo == null) return;
-
-                          setState(() {
-                            _tipoSelecionado = tipo;
-                          });
-                        },
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: _tipoSelecionado,
+                          decoration: const InputDecoration(labelText: 'Tipo'),
+                          items: _tipoOptions.map((tipo) {
+                            return DropdownMenuItem(
+                              value: tipo,
+                              child: Text(tipo),
+                            );
+                          }).toList(),
+                          onChanged: (tipo) {
+                            if (tipo == null) return;
+
+                            setState(() {
+                              _tipoSelecionado = tipo;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 if (pedidosFiltrados.isEmpty)
@@ -186,38 +193,69 @@ class _PedidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: AppCard(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
                     'Pedido #${pedido.id}',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text(
-                    valorFormatado,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                StatusBadge(status: pedido.status),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              pedido.clienteNome,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(pedido.clienteNome),
-              const SizedBox(height: 8),
-              Text('Tipo: ${pedido.tipo}'),
-              Text('Status: ${pedido.status}'),
-              Text('Data: $dataFormatada'),
-            ],
-          ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.gold.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    pedido.tipo,
+                    style: const TextStyle(
+                      color: AppTheme.caramel,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  valorFormatado,
+                  style: const TextStyle(
+                    color: AppTheme.primaryRed,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Data: $dataFormatada',
+              style: const TextStyle(color: AppTheme.supportGray),
+            ),
+          ],
         ),
       ),
     );

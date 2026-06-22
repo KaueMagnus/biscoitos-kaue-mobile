@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../models/pedido.dart';
 import '../../providers/pedido_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/section_title.dart';
+import '../../widgets/status_badge.dart';
 
 class DetalhePedidoScreen extends StatefulWidget {
   final int pedidoId;
@@ -85,34 +89,43 @@ class _DetalhePedidoScreenState extends State<DetalhePedidoScreen> {
                 ),
               ],
               const SizedBox(height: 20),
-              const Text(
-                'Produtos',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              const SectionTitle(
+                title: 'Produtos',
+                subtitle: 'Itens incluídos neste pedido.',
               ),
               const SizedBox(height: 8),
               if (pedido.itens.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('Nenhum produto encontrado.'),
-                  ),
-                )
+                const AppCard(child: Text('Nenhum produto encontrado.'))
               else
                 ...pedido.itens.map(
-                  (item) => _ItemPedidoCard(
-                    item: item,
-                    precoFormatado: _formatarValor(item.precoUnitario),
-                    descontoFormatado: _formatarValor(item.desconto),
-                    subtotalFormatado: _formatarValor(item.subtotal),
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _ItemPedidoCard(
+                      item: item,
+                      precoFormatado: _formatarValor(item.precoUnitario),
+                      descontoFormatado: _formatarValor(item.desconto),
+                      subtotalFormatado: _formatarValor(item.subtotal),
+                    ),
                   ),
                 ),
-              const SizedBox(height: 16),
-              Text(
-                'Total: ${_formatarValor(pedido.valorTotal)}',
-                textAlign: TextAlign.end,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 6),
+              AppCard(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Valor total',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      _formatarValor(pedido.valorTotal),
+                      style: const TextStyle(
+                        color: AppTheme.primaryRed,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -136,22 +149,67 @@ class _ResumoPedidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              pedido.clienteNome,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  pedido.clienteNome,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              StatusBadge(status: pedido.status),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _InfoPill(label: 'Pedido #${pedido.id}'),
+              _InfoPill(label: pedido.tipo),
+              _InfoPill(label: dataFormatada),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Total: $valorFormatado',
+            style: const TextStyle(
+              color: AppTheme.primaryRed,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 12),
-            Text('Tipo: ${pedido.tipo}'),
-            Text('Status: ${pedido.status}'),
-            Text('Data: $dataFormatada'),
-            Text('Total: $valorFormatado'),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  final String label;
+
+  const _InfoPill({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.creamCard,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: AppTheme.caramel,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
         ),
       ),
     );
@@ -166,17 +224,14 @@ class _TextoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(texto),
-          ],
-        ),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text(texto),
+        ],
       ),
     );
   }
@@ -197,23 +252,27 @@ class _ItemPedidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              item.produtoNome,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            item.produtoNome,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text('Quantidade: ${item.quantidade}'),
+          Text('Preço unitário: $precoFormatado'),
+          Text('Desconto: $descontoFormatado'),
+          const SizedBox(height: 6),
+          Text(
+            'Subtotal: $subtotalFormatado',
+            style: const TextStyle(
+              color: AppTheme.primaryRed,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 8),
-            Text('Quantidade: ${item.quantidade}'),
-            Text('Preço unitário: $precoFormatado'),
-            Text('Desconto: $descontoFormatado'),
-            Text('Subtotal: $subtotalFormatado'),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

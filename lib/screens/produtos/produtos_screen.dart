@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../models/produto.dart';
 import '../../providers/produto_provider.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/section_title.dart';
 
 class ProdutosScreen extends StatefulWidget {
   const ProdutosScreen({super.key});
@@ -70,38 +73,81 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
             return const Center(child: Text('Nenhum produto encontrado.'));
           }
 
-          return Column(
+          return ListView(
+            padding: const EdgeInsets.all(16),
             children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: TextField(
-                  controller: _buscaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar produto',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (_) => _atualizarBusca(),
+              const SectionTitle(
+                title: 'Produtos',
+                subtitle: 'Busque por nome ou código.',
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _buscaController,
+                decoration: const InputDecoration(
+                  labelText: 'Buscar produto',
+                  prefixIcon: Icon(Icons.search),
                 ),
+                onChanged: (_) => _atualizarBusca(),
               ),
-              Expanded(
-                child: produtosFiltrados.isEmpty
-                    ? const Center(child: Text('Nenhum produto encontrado.'))
-                    : ListView.builder(
-                        itemCount: produtosFiltrados.length,
-                        itemBuilder: (context, index) {
-                          final produto = produtosFiltrados[index];
-
-                          return ListTile(
-                            title: Text(produto.nome),
-                            subtitle: Text(produto.codigo),
-                            trailing: Text(
-                              'R\$ ${produto.preco.toStringAsFixed(2)}',
+              const SizedBox(height: 12),
+              if (produtosFiltrados.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 48),
+                  child: Center(child: Text('Nenhum produto encontrado.')),
+                )
+              else
+                ...produtosFiltrados.map((produto) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: AppCard(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: AppTheme.gold.withValues(alpha: 0.22),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          );
-                        },
+                            child: const Icon(
+                              Icons.cookie_outlined,
+                              color: AppTheme.caramel,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  produto.nome,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Código ${produto.codigo}',
+                                  style: const TextStyle(
+                                    color: AppTheme.supportGray,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            'R\$ ${produto.preco.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              color: AppTheme.primaryRed,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-              ),
+                    ),
+                  );
+                }),
             ],
           );
         },
