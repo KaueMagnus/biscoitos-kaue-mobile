@@ -75,17 +75,12 @@ class HomeScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: AppTheme.gold,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.storefront_outlined,
-                    color: AppTheme.brandBlack,
-                    size: 30,
+                SizedBox(
+                  width: 70,
+                  height: 58,
+                  child: Image.asset(
+                    'assets/images/logo_biscoitos_kaue.png',
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(width: 14),

@@ -53,7 +53,7 @@ class _DetalhePedidoScreenState extends State<DetalhePedidoScreen> {
     final pedidoProvider = context.watch<PedidoProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Pedido #${widget.pedidoId}')),
+      appBar: AppBar(title: const Text('Detalhes do pedido')),
       body: Builder(
         builder: (_) {
           if (pedidoProvider.isLoadingDetalhe) {

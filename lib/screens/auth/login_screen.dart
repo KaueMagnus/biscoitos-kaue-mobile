@@ -65,16 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 children: [
                   SizedBox(
-                    width: 230,
-                    height: 150,
-                    child: ClipRect(
-                      child: Transform.scale(
-                        scale: 3.4,
-                        child: Image.asset(
-                          'assets/images/logo_biscoitoskaue.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    height: 190,
+                    child: Image.asset(
+                      'assets/images/logo_biscoitos_kaue.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 14),
