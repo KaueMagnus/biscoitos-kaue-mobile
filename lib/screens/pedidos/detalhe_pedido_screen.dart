@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/formatters/currency_formatter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/pedido.dart';
 import '../../providers/pedido_provider.dart';
@@ -41,7 +42,7 @@ class _DetalhePedidoScreenState extends State<DetalhePedidoScreen> {
   }
 
   String _formatarValor(double valor) {
-    return 'R\$ ${valor.toStringAsFixed(2)}';
+    return formatarMoedaReal(valor);
   }
 
   bool _temTexto(String? texto) {

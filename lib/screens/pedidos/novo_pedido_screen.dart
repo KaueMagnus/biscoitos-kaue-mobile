@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/formatters/currency_formatter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/cliente.dart';
 import '../../models/item_pedido_request.dart';
@@ -283,7 +284,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${produto.codigo} • R\$ ${produto.preco.toStringAsFixed(2)}',
+                                  '${produto.codigo} • ${formatarMoedaReal(produto.preco)}',
                                   style: const TextStyle(
                                     color: AppTheme.supportGray,
                                   ),
@@ -360,7 +361,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'R\$ ${total.toStringAsFixed(2)}',
+                        formatarMoedaReal(total),
                         style: const TextStyle(
                           color: AppTheme.primaryRed,
                           fontSize: 20,

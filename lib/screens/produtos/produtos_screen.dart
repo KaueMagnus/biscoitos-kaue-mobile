@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/formatters/currency_formatter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/produto.dart';
 import '../../providers/produto_provider.dart';
@@ -137,7 +138,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                             ),
                           ),
                           Text(
-                            'R\$ ${produto.preco.toStringAsFixed(2)}',
+                            formatarMoedaReal(produto.preco),
                             style: const TextStyle(
                               color: AppTheme.primaryRed,
                               fontWeight: FontWeight.bold,
