@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/cliente_provider.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/section_title.dart';
 
@@ -71,12 +72,9 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          clienteProvider.errorMessage ?? 'Não foi possível cadastrar cliente.',
-        ),
-      ),
+    AppSnackBar.showError(
+      context,
+      clienteProvider.errorMessage ?? 'Erro ao cadastrar cliente.',
     );
   }
 

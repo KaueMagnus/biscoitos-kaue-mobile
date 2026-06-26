@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/cliente.dart';
 import '../../providers/cliente_provider.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/section_title.dart';
 import 'novo_cliente_screen.dart';
 
@@ -67,9 +68,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cliente cadastrado com sucesso.')),
-      );
+      AppSnackBar.showSuccess(context, 'Cliente cadastrado com sucesso!');
     }
   }
 

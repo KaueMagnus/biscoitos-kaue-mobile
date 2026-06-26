@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/primary_button.dart';
 import '../home/home_screen.dart';
 
@@ -40,10 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authProvider.errorMessage ?? 'Erro ao fazer login.'),
-        ),
+      AppSnackBar.showError(
+        context,
+        authProvider.errorMessage ?? 'Erro ao fazer login.',
       );
     }
   }

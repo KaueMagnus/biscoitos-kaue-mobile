@@ -11,6 +11,7 @@ import '../../providers/cliente_provider.dart';
 import '../../providers/pedido_provider.dart';
 import '../../providers/produto_provider.dart';
 import '../../widgets/app_card.dart';
+import '../../widgets/app_snack_bar.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/section_title.dart';
 
@@ -151,17 +152,18 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
     if (!mounted) return;
 
     if (sucesso) {
-      _mostrarMensagem('Pedido criado com sucesso.');
+      AppSnackBar.showSuccess(context, 'Pedido enviado com sucesso!');
       Navigator.of(context).pop();
     } else {
-      _mostrarMensagem(pedidoProvider.errorMessage ?? 'Erro ao criar pedido.');
+      AppSnackBar.showError(
+        context,
+        pedidoProvider.errorMessage ?? 'Erro ao enviar pedido.',
+      );
     }
   }
 
   void _mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(mensagem)));
+    AppSnackBar.showInfo(context, mensagem);
   }
 
   @override
