@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -26,6 +27,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   Cliente? _clienteSelecionado;
   String _tipoPedido = 'NORMAL';
   final Map<int, int> _quantidades = {};
+  final Map<int, TextEditingController> _quantidadeControllers = {};
 
   @override
   void initState() {
@@ -43,12 +45,49 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   void dispose() {
     _observacaoController.dispose();
     _motivoTrocaController.dispose();
+    for (final controller in _quantidadeControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   void _alterarQuantidade(Produto produto, int quantidade) {
     setState(() {
       if (quantidade <= 0) {
+        _quantidades.remove(produto.id);
+      } else {
+        _quantidades[produto.id] = quantidade;
+      }
+
+      _atualizarTextoQuantidade(produto.id, quantidade);
+    });
+  }
+
+  TextEditingController _controllerQuantidade(Produto produto) {
+    return _quantidadeControllers.putIfAbsent(
+      produto.id,
+      () => TextEditingController(
+        text: (_quantidades[produto.id] ?? 0).toString(),
+      ),
+    );
+  }
+
+  void _atualizarTextoQuantidade(int produtoId, int quantidade) {
+    final controller = _quantidadeControllers[produtoId];
+    if (controller == null) return;
+
+    final texto = quantidade <= 0 ? '0' : quantidade.toString();
+    controller.value = TextEditingValue(
+      text: texto,
+      selection: TextSelection.collapsed(offset: texto.length),
+    );
+  }
+
+  void _digitarQuantidade(Produto produto, String valor) {
+    final quantidade = int.tryParse(valor);
+
+    setState(() {
+      if (quantidade == null || quantidade <= 0) {
         _quantidades.remove(produto.id);
       } else {
         _quantidades[produto.id] = quantidade;
@@ -225,6 +264,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                 const SizedBox(height: 8),
                 ...produtos.map((produto) {
                   final quantidade = _quantidades[produto.id] ?? 0;
+                  final quantidadeController = _controllerQuantidade(produto);
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -270,10 +310,25 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                                   color: AppTheme.primaryRed,
                                 ),
                                 SizedBox(
-                                  width: 28,
-                                  child: Text(
-                                    '$quantidade',
+                                  width: 54,
+                                  child: TextField(
+                                    controller: quantidadeController,
                                     textAlign: TextAlign.center,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    decoration: const InputDecoration(
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 10,
+                                      ),
+                                      border: InputBorder.none,
+                                      filled: false,
+                                    ),
+                                    onChanged: (valor) =>
+                                        _digitarQuantidade(produto, valor),
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
