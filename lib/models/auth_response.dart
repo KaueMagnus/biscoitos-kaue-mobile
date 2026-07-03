@@ -8,9 +8,15 @@ class AuthResponse {
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    final token = json['token'];
+
+    if (token == null) {
+      throw Exception('Token não encontrado na resposta do login.');
+    }
+
     return AuthResponse(
-      token: json['token'],
-      tipo: json['tipo'],
+      token: token.toString(),
+      tipo: (json['tipo'] ?? json['perfil'] ?? '').toString(),
     );
   }
 }
