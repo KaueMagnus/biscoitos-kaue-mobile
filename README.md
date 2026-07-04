@@ -322,7 +322,7 @@ https://biscoitos-kaue-web.vercel.app/login
 
 APK:
 
-[Baixar APK do aplicativo mobile](https://drive.google.com/file/d/1AYGlK3rkz0xZrCHLfP76-dT7p7OwhFVs/view?usp=sharing)
+[Baixar APK do aplicativo mobile](https://drive.google.com/file/d/1H6BKzXM1XJhrsThZPU9eXw8oMcPUGkhT/view?usp=sharing)
 
 ---
 
