@@ -136,7 +136,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _HomeActionCard(
             icon: Icons.receipt_long_outlined,
-            title: 'Pedidos',
+            title: 'Últimos Pedidos',
             subtitle: 'Acompanhar status e detalhes',
             onTap: () => _abrirPedidos(context),
           ),

@@ -68,8 +68,8 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   TextEditingController _controllerQuantidade(Produto produto) {
     return _quantidadeControllers.putIfAbsent(
       produto.id,
-      () => TextEditingController(
-        text: (_quantidades[produto.id] ?? 0).toString(),
+          () => TextEditingController(
+        text: _quantidades[produto.id]?.toString() ?? '',
       ),
     );
   }
@@ -78,7 +78,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
     final controller = _quantidadeControllers[produtoId];
     if (controller == null) return;
 
-    final texto = quantidade <= 0 ? '0' : quantidade.toString();
+    final texto = quantidade <= 0 ? '' : quantidade.toString();
     controller.value = TextEditingValue(
       text: texto,
       selection: TextSelection.collapsed(offset: texto.length),
@@ -322,6 +322,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
                                     decoration: const InputDecoration(
+                                      hintText: '0',
                                       isDense: true,
                                       contentPadding: EdgeInsets.symmetric(
                                         horizontal: 4,

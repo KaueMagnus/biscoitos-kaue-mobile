@@ -83,7 +83,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pedidos')),
+      appBar: AppBar(title: const Text('Últimos Pedidos')),
       body: Builder(
         builder: (_) {
           if (pedidoProvider.isLoadingLista) {
@@ -104,7 +104,7 @@ class _PedidosScreenState extends State<PedidosScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 const SectionTitle(
-                  title: 'Pedidos',
+                  title: 'Últimos Pedidos',
                   subtitle: 'Filtre por status ou tipo do pedido.',
                 ),
                 const SizedBox(height: 12),

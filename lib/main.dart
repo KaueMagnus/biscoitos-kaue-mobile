@@ -13,6 +13,7 @@ import 'services/cliente_service.dart';
 import 'services/produto_service.dart';
 import 'providers/pedido_provider.dart';
 import 'services/pedido_service.dart';
+import 'screens/home/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,13 +48,18 @@ void main() async {
               PedidoProvider(pedidoService: context.read<PedidoService>()),
         ),
       ],
-      child: const BiscoitosKaueApp(),
+      child: BiscoitosKaueApp(tokenStorage: tokenStorage),
     ),
   );
 }
 
 class BiscoitosKaueApp extends StatelessWidget {
-  const BiscoitosKaueApp({super.key});
+  final TokenStorage tokenStorage;
+
+  const BiscoitosKaueApp({
+    super.key,
+    required this.tokenStorage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +67,24 @@ class BiscoitosKaueApp extends StatelessWidget {
       title: 'Biscoitos Kauê',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      home: const LoginScreen(),
+      home: FutureBuilder<String?>(
+        future: tokenStorage.getToken(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final token = snapshot.data;
+
+          if (token != null && token.isNotEmpty) {
+            return const HomeScreen();
+          }
+
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }
