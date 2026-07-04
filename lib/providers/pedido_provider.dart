@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
 import '../models/item_pedido_request.dart';
 import '../models/pedido.dart';
@@ -82,9 +83,31 @@ class PedidoProvider extends ChangeNotifier {
 
       await _pedidoService.criarPedido(pedido);
       return true;
+    } on DioException catch (error) {
+      debugPrint('Erro ao criar pedido - DioException');
+      debugPrint('Status: ${error.response?.statusCode}');
+      debugPrint('Data: ${error.response?.data}');
+      debugPrint('Message: ${error.message}');
+
+      final statusCode = error.response?.statusCode;
+      final data = error.response?.data;
+
+      if (data is Map) {
+        _errorMessage = (data['message'] ??
+            data['error'] ??
+            data['detail'] ??
+            data.toString())
+            .toString();
+      } else if (data != null) {
+        _errorMessage = data.toString();
+      } else {
+        _errorMessage = 'Erro $statusCode: ${error.message}';
+      }
+
+      return false;
     } catch (error) {
-      debugPrint('Erro ao criar pedido: $error');
-      _errorMessage = 'Erro ao criar pedido.';
+      debugPrint('Erro ao criar pedido - erro genérico: $error');
+      _errorMessage = error.toString();
       return false;
     } finally {
       _isLoading = false;
