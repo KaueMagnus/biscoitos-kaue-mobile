@@ -11,8 +11,13 @@ import '../../widgets/status_badge.dart';
 
 class DetalhePedidoScreen extends StatefulWidget {
   final int pedidoId;
+  final int? numeroExibicao;
 
-  const DetalhePedidoScreen({super.key, required this.pedidoId});
+  const DetalhePedidoScreen({
+    super.key,
+    required this.pedidoId,
+    this.numeroExibicao,
+  });
 
   @override
   State<DetalhePedidoScreen> createState() => _DetalhePedidoScreenState();
@@ -75,6 +80,7 @@ class _DetalhePedidoScreenState extends State<DetalhePedidoScreen> {
             children: [
               _ResumoPedidoCard(
                 pedido: pedido,
+                numeroExibicao: widget.numeroExibicao ?? pedido.id,
                 dataFormatada: _formatarData(pedido.dataCriacao),
                 valorFormatado: _formatarValor(pedido.valorTotal),
               ),
@@ -139,11 +145,13 @@ class _DetalhePedidoScreenState extends State<DetalhePedidoScreen> {
 
 class _ResumoPedidoCard extends StatelessWidget {
   final Pedido pedido;
+  final int numeroExibicao;
   final String dataFormatada;
   final String valorFormatado;
 
   const _ResumoPedidoCard({
     required this.pedido,
+    required this.numeroExibicao,
     required this.dataFormatada,
     required this.valorFormatado,
   });
@@ -173,7 +181,7 @@ class _ResumoPedidoCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _InfoPill(label: 'Pedido #${pedido.id}'),
+              _InfoPill(label: 'Pedido #$numeroExibicao'),
               _InfoPill(label: pedido.tipo),
               _InfoPill(label: dataFormatada),
             ],

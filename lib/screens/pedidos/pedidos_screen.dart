@@ -56,10 +56,13 @@ class _PedidosScreenState extends State<PedidosScreen> {
     return formatarMoedaReal(valor);
   }
 
-  void _abrirDetalhePedido(Pedido pedido) {
+  void _abrirDetalhePedido(Pedido pedido, int numeroExibicao) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => DetalhePedidoScreen(pedidoId: pedido.id),
+        builder: (_) => DetalhePedidoScreen(
+          pedidoId: pedido.id,
+          numeroExibicao: numeroExibicao,
+        ),
       ),
     );
   }
@@ -75,12 +78,52 @@ class _PedidosScreenState extends State<PedidosScreen> {
     return statusOk && tipoOk;
   }
 
+  Map<int, int> _montarNumeracaoDosPedidos(List<Pedido> pedidos) {
+    final pedidosOrdenados = [...pedidos];
+
+    pedidosOrdenados.sort((a, b) {
+      final dataA = a.dataCriacao;
+      final dataB = b.dataCriacao;
+
+      if (dataA == null && dataB == null) {
+        return a.id.compareTo(b.id);
+      }
+
+      if (dataA == null) {
+        return -1;
+      }
+
+      if (dataB == null) {
+        return 1;
+      }
+
+      final comparacaoData = dataA.compareTo(dataB);
+
+      if (comparacaoData != 0) {
+        return comparacaoData;
+      }
+
+      return a.id.compareTo(b.id);
+    });
+
+    final numerosPorPedidoId = <int, int>{};
+
+    for (var i = 0; i < pedidosOrdenados.length; i++) {
+      numerosPorPedidoId[pedidosOrdenados[i].id] = i + 1;
+    }
+
+    return numerosPorPedidoId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final pedidoProvider = context.watch<PedidoProvider>();
     final pedidosFiltrados = pedidoProvider.pedidos
         .where(_pedidoPassaNosFiltros)
         .toList();
+    final numerosPorPedidoId = _montarNumeracaoDosPedidos(
+      pedidoProvider.pedidos,
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Últimos Pedidos')),
@@ -163,11 +206,14 @@ class _PedidosScreenState extends State<PedidosScreen> {
                   )
                 else
                   ...pedidosFiltrados.map((pedido) {
+                    final numeroExibicao = numerosPorPedidoId[pedido.id] ?? pedido.id;
+
                     return _PedidoCard(
                       pedido: pedido,
+                      numeroExibicao: numeroExibicao,
                       dataFormatada: _formatarData(pedido.dataCriacao),
                       valorFormatado: _formatarValor(pedido.valorTotal),
-                      onTap: () => _abrirDetalhePedido(pedido),
+                      onTap: () => _abrirDetalhePedido(pedido, numeroExibicao),
                     );
                   }),
               ],
@@ -181,12 +227,14 @@ class _PedidosScreenState extends State<PedidosScreen> {
 
 class _PedidoCard extends StatelessWidget {
   final Pedido pedido;
+  final int numeroExibicao;
   final String dataFormatada;
   final String valorFormatado;
   final VoidCallback onTap;
 
   const _PedidoCard({
     required this.pedido,
+    required this.numeroExibicao,
     required this.dataFormatada,
     required this.valorFormatado,
     required this.onTap,
@@ -205,7 +253,7 @@ class _PedidoCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'Pedido #${pedido.id}',
+                    'Pedido #$numeroExibicao',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
