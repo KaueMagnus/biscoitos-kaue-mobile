@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/cliente_provider.dart';
@@ -16,25 +17,68 @@ class NovoClienteScreen extends StatefulWidget {
 
 class _NovoClienteScreenState extends State<NovoClienteScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nomeController = TextEditingController();
-  final _cidadeController = TextEditingController();
+
+  final _razaoSocialController = TextEditingController();
+  final _nomeFantasiaController = TextEditingController();
+  final _cnpjController = TextEditingController();
+  final _inscricaoEstadualController = TextEditingController();
+  final _nomeCompradorController = TextEditingController();
+
   final _telefoneController = TextEditingController();
   final _emailController = TextEditingController();
-  final _documentoController = TextEditingController();
+
+  final _ruaController = TextEditingController();
+  final _bairroController = TextEditingController();
+  final _cidadeController = TextEditingController();
+  final _estadoController = TextEditingController();
+  final _cepController = TextEditingController();
 
   @override
   void dispose() {
-    _nomeController.dispose();
-    _cidadeController.dispose();
+    _razaoSocialController.dispose();
+    _nomeFantasiaController.dispose();
+    _cnpjController.dispose();
+    _inscricaoEstadualController.dispose();
+    _nomeCompradorController.dispose();
     _telefoneController.dispose();
     _emailController.dispose();
-    _documentoController.dispose();
+    _ruaController.dispose();
+    _bairroController.dispose();
+    _cidadeController.dispose();
+    _estadoController.dispose();
+    _cepController.dispose();
     super.dispose();
   }
 
   String? _validarObrigatorio(String? valor, String campo) {
     if (valor == null || valor.trim().isEmpty) {
       return '$campo é obrigatório.';
+    }
+
+    return null;
+  }
+
+  String? _validarEstado(String? valor) {
+    if (valor == null || valor.trim().isEmpty) {
+      return 'Estado é obrigatório.';
+    }
+
+    if (valor.trim().length != 2) {
+      return 'Use a sigla do estado. Ex: SC';
+    }
+
+    return null;
+  }
+
+  String? _validarEmailOpcional(String? valor) {
+    final texto = valor?.trim() ?? '';
+
+    if (texto.isEmpty) {
+      return null;
+    }
+
+    if (!texto.contains('@') || !texto.contains('.')) {
+      return 'Informe um e-mail válido.';
     }
 
     return null;
@@ -52,17 +96,26 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
 
   Future<void> _salvarCliente() async {
     final formValido = _formKey.currentState?.validate() ?? false;
+
     if (!formValido) {
       return;
     }
 
     final clienteProvider = context.read<ClienteProvider>();
+
     final sucesso = await clienteProvider.cadastrarCliente(
-      nome: _nomeController.text.trim(),
-      cidade: _cidadeController.text.trim(),
-      telefone: _textoOpcional(_telefoneController.text),
+      razaoSocial: _razaoSocialController.text.trim(),
+      nomeFantasia: _nomeFantasiaController.text.trim(),
+      cnpj: _cnpjController.text.trim(),
+      inscricaoEstadual: _textoOpcional(_inscricaoEstadualController.text),
+      nomeComprador: _textoOpcional(_nomeCompradorController.text),
+      telefone: _telefoneController.text.trim(),
       email: _textoOpcional(_emailController.text),
-      documento: _textoOpcional(_documentoController.text),
+      rua: _textoOpcional(_ruaController.text),
+      bairro: _textoOpcional(_bairroController.text),
+      cidade: _cidadeController.text.trim(),
+      estado: _estadoController.text.trim().toUpperCase(),
+      cep: _textoOpcional(_cepController.text),
     );
 
     if (!mounted) return;
@@ -95,35 +148,78 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
                 subtitle: 'O cliente será vinculado ao representante logado.',
               ),
               const SizedBox(height: 16),
+
               AppCard(
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: _nomeController,
+                      controller: _razaoSocialController,
                       decoration: const InputDecoration(
-                        labelText: 'Nome',
-                        prefixIcon: Icon(Icons.storefront_outlined),
+                        labelText: 'Razão Social',
+                        prefixIcon: Icon(Icons.business_outlined),
                       ),
-                      validator: (valor) => _validarObrigatorio(valor, 'Nome'),
+                      textCapitalization: TextCapitalization.words,
+                      validator: (valor) =>
+                          _validarObrigatorio(valor, 'Razão Social'),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: _cidadeController,
+                      controller: _nomeFantasiaController,
                       decoration: const InputDecoration(
-                        labelText: 'Cidade',
-                        prefixIcon: Icon(Icons.location_city_outlined),
+                        labelText: 'Nome Fantasia',
+                        prefixIcon: Icon(Icons.storefront_outlined),
                       ),
+                      textCapitalization: TextCapitalization.words,
                       validator: (valor) =>
-                          _validarObrigatorio(valor, 'Cidade'),
+                          _validarObrigatorio(valor, 'Nome Fantasia'),
                     ),
                     const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _cnpjController,
+                      decoration: const InputDecoration(
+                        labelText: 'CNPJ',
+                        prefixIcon: Icon(Icons.badge_outlined),
+                      ),
+                      keyboardType: TextInputType.text,
+                      validator: (valor) =>
+                          _validarObrigatorio(valor, 'CNPJ'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _inscricaoEstadualController,
+                      decoration: const InputDecoration(
+                        labelText: 'IE',
+                        prefixIcon: Icon(Icons.confirmation_number_outlined),
+                      ),
+                      keyboardType: TextInputType.text,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _nomeCompradorController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nome Comprador',
+                        prefixIcon: Icon(Icons.person_outline),
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              AppCard(
+                child: Column(
+                  children: [
                     TextFormField(
                       controller: _telefoneController,
                       decoration: const InputDecoration(
-                        labelText: 'Telefone',
+                        labelText: 'Contato / Telefone',
                         prefixIcon: Icon(Icons.phone_outlined),
                       ),
                       keyboardType: TextInputType.phone,
+                      validator: (valor) =>
+                          _validarObrigatorio(valor, 'Contato / Telefone'),
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -133,19 +229,74 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                       keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _documentoController,
-                      decoration: const InputDecoration(
-                        labelText: 'Documento/CNPJ',
-                        prefixIcon: Icon(Icons.badge_outlined),
-                      ),
+                      validator: _validarEmailOpcional,
                     ),
                   ],
                 ),
               ),
+
+              const SizedBox(height: 16),
+
+              AppCard(
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _ruaController,
+                      decoration: const InputDecoration(
+                        labelText: 'Rua',
+                        prefixIcon: Icon(Icons.location_on_outlined),
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _bairroController,
+                      decoration: const InputDecoration(
+                        labelText: 'Bairro',
+                        prefixIcon: Icon(Icons.map_outlined),
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _cidadeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Cidade',
+                        prefixIcon: Icon(Icons.location_city_outlined),
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                      validator: (valor) =>
+                          _validarObrigatorio(valor, 'Cidade'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _estadoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Estado',
+                        hintText: 'SC',
+                        prefixIcon: Icon(Icons.flag_outlined),
+                      ),
+                      textCapitalization: TextCapitalization.characters,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(2),
+                      ],
+                      validator: _validarEstado,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _cepController,
+                      decoration: const InputDecoration(
+                        labelText: 'CEP',
+                        prefixIcon: Icon(Icons.markunread_mailbox_outlined),
+                      ),
+                      keyboardType: TextInputType.text,
+                    ),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 24),
+
               PrimaryButton(
                 label: 'Salvar cliente',
                 icon: Icons.save_outlined,

@@ -34,7 +34,9 @@ class PedidoProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _pedidos = await _pedidoService.listarPedidos();
+      final pedidos = await _pedidoService.listarPedidos();
+      pedidos.sort(_compararPedidosPorMaisRecente);
+      _pedidos = pedidos;
     } catch (error) {
       debugPrint('Erro ao carregar pedidos: $error');
       _errorMessage = 'Erro ao carregar pedidos.';
@@ -113,5 +115,30 @@ class PedidoProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  int _compararPedidosPorMaisRecente(Pedido a, Pedido b) {
+    final dataA = a.dataCriacao;
+    final dataB = b.dataCriacao;
+
+    if (dataA == null && dataB == null) {
+      return b.id.compareTo(a.id);
+    }
+
+    if (dataA == null) {
+      return 1;
+    }
+
+    if (dataB == null) {
+      return -1;
+    }
+
+    final comparacaoData = dataB.compareTo(dataA);
+
+    if (comparacaoData != 0) {
+      return comparacaoData;
+    }
+
+    return b.id.compareTo(a.id);
   }
 }

@@ -8,7 +8,7 @@ class ClienteProvider extends ChangeNotifier {
   final ClienteService _clienteService;
 
   ClienteProvider({required ClienteService clienteService})
-    : _clienteService = clienteService;
+      : _clienteService = clienteService;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -19,11 +19,18 @@ class ClienteProvider extends ChangeNotifier {
   List<Cliente> get clientes => _clientes;
 
   Future<bool> cadastrarCliente({
-    required String nome,
-    required String cidade,
-    String? telefone,
+    required String razaoSocial,
+    required String nomeFantasia,
+    required String cnpj,
+    String? inscricaoEstadual,
+    String? nomeComprador,
+    required String telefone,
     String? email,
-    String? documento,
+    String? rua,
+    String? bairro,
+    required String cidade,
+    required String estado,
+    String? cep,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -31,11 +38,23 @@ class ClienteProvider extends ChangeNotifier {
 
     try {
       final cliente = ClienteRequest(
-        nome: nome,
+        // Campos antigos para compatibilidade
+        nome: nomeFantasia,
         cidade: cidade,
         telefone: telefone,
         email: email,
-        documento: documento,
+        documento: cnpj,
+
+        // Campos novos
+        razaoSocial: razaoSocial,
+        nomeFantasia: nomeFantasia,
+        cnpj: cnpj,
+        inscricaoEstadual: inscricaoEstadual,
+        nomeComprador: nomeComprador,
+        rua: rua,
+        bairro: bairro,
+        estado: estado,
+        cep: cep,
       );
 
       await _clienteService.cadastrarCliente(cliente);
