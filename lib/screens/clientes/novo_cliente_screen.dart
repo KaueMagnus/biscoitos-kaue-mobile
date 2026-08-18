@@ -58,6 +58,38 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
     return null;
   }
 
+  String? _validarCpfCnpj(String? valor) {
+    final texto = valor?.trim() ?? '';
+
+    if (texto.isEmpty) {
+      return 'CNPJ / CPF é obrigatório.';
+    }
+
+    final digitos = _somenteDigitos(texto);
+
+    if (digitos.length != 11 && digitos.length != 14) {
+      return 'Informe um CPF com 11 dígitos ou CNPJ com 14 dígitos.';
+    }
+
+    return null;
+  }
+
+  String? _validarTelefone(String? valor) {
+    final texto = valor?.trim() ?? '';
+
+    if (texto.isEmpty) {
+      return 'WhatsApp / Telefone é obrigatório.';
+    }
+
+    final digitos = _somenteDigitos(texto);
+
+    if (digitos.length < 10 || digitos.length > 11) {
+      return 'Informe um telefone com DDD.';
+    }
+
+    return null;
+  }
+
   String? _validarEstado(String? valor) {
     if (valor == null || valor.trim().isEmpty) {
       return 'Estado é obrigatório.';
@@ -65,6 +97,22 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
 
     if (valor.trim().length != 2) {
       return 'Use a sigla do estado. Ex: SC';
+    }
+
+    return null;
+  }
+
+  String? _validarCepOpcional(String? valor) {
+    final texto = valor?.trim() ?? '';
+
+    if (texto.isEmpty) {
+      return null;
+    }
+
+    final digitos = _somenteDigitos(texto);
+
+    if (digitos.length != 8) {
+      return 'Informe um CEP com 8 dígitos.';
     }
 
     return null;
@@ -92,6 +140,10 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
     }
 
     return textoLimpo;
+  }
+
+  String _somenteDigitos(String texto) {
+    return texto.replaceAll(RegExp(r'[^0-9]'), '');
   }
 
   Future<void> _salvarCliente() async {
@@ -177,21 +229,30 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
                     TextFormField(
                       controller: _cnpjController,
                       decoration: const InputDecoration(
-                        labelText: 'CNPJ',
+                        labelText: 'CNPJ / CPF',
+                        hintText: '00.000.000/0000-00',
                         prefixIcon: Icon(Icons.badge_outlined),
                       ),
-                      keyboardType: TextInputType.text,
-                      validator: (valor) =>
-                          _validarObrigatorio(valor, 'CNPJ'),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CpfCnpjInputFormatter(),
+                      ],
+                      validator: _validarCpfCnpj,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _inscricaoEstadualController,
                       decoration: const InputDecoration(
-                        labelText: 'IE',
+                        labelText: 'IE / Isento',
+                        hintText: 'Ex: ISENTO',
                         prefixIcon: Icon(Icons.confirmation_number_outlined),
                       ),
-                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.characters,
+                      inputFormatters: [
+                        UpperCaseTextFormatter(),
+                        LengthLimitingTextInputFormatter(30),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -214,12 +275,16 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
                     TextFormField(
                       controller: _telefoneController,
                       decoration: const InputDecoration(
-                        labelText: 'Contato / Telefone',
+                        labelText: 'WhatsApp / Telefone',
+                        hintText: '(00) 00000-0000',
                         prefixIcon: Icon(Icons.phone_outlined),
                       ),
                       keyboardType: TextInputType.phone,
-                      validator: (valor) =>
-                          _validarObrigatorio(valor, 'Contato / Telefone'),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        PhoneInputFormatter(),
+                      ],
+                      validator: _validarTelefone,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -278,6 +343,7 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
                       ),
                       textCapitalization: TextCapitalization.characters,
                       inputFormatters: [
+                        UpperCaseTextFormatter(),
                         LengthLimitingTextInputFormatter(2),
                       ],
                       validator: _validarEstado,
@@ -287,9 +353,15 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
                       controller: _cepController,
                       decoration: const InputDecoration(
                         labelText: 'CEP',
+                        hintText: '00000-000',
                         prefixIcon: Icon(Icons.markunread_mailbox_outlined),
                       ),
-                      keyboardType: TextInputType.text,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CepInputFormatter(),
+                      ],
+                      validator: _validarCepOpcional,
                     ),
                   ],
                 ),
@@ -307,6 +379,162 @@ class _NovoClienteScreenState extends State<NovoClienteScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class CpfCnpjInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    var digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digits.length > 14) {
+      digits = digits.substring(0, 14);
+    }
+
+    final formatted = digits.length <= 11
+        ? _formatCpf(digits)
+        : _formatCnpj(digits);
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+
+  String _formatCpf(String digits) {
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < digits.length; i++) {
+      if (i == 3 || i == 6) {
+        buffer.write('.');
+      }
+
+      if (i == 9) {
+        buffer.write('-');
+      }
+
+      buffer.write(digits[i]);
+    }
+
+    return buffer.toString();
+  }
+
+  String _formatCnpj(String digits) {
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < digits.length; i++) {
+      if (i == 2 || i == 5) {
+        buffer.write('.');
+      }
+
+      if (i == 8) {
+        buffer.write('/');
+      }
+
+      if (i == 12) {
+        buffer.write('-');
+      }
+
+      buffer.write(digits[i]);
+    }
+
+    return buffer.toString();
+  }
+}
+
+class PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    var digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digits.length > 11) {
+      digits = digits.substring(0, 11);
+    }
+
+    final formatted = _formatPhone(digits);
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+
+  String _formatPhone(String digits) {
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < digits.length; i++) {
+      if (i == 0) {
+        buffer.write('(');
+      }
+
+      if (i == 2) {
+        buffer.write(') ');
+      }
+
+      if (digits.length <= 10 && i == 6) {
+        buffer.write('-');
+      }
+
+      if (digits.length == 11 && i == 7) {
+        buffer.write('-');
+      }
+
+      buffer.write(digits[i]);
+    }
+
+    return buffer.toString();
+  }
+}
+
+class CepInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    var digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digits.length > 8) {
+      digits = digits.substring(0, 8);
+    }
+
+    final buffer = StringBuffer();
+
+    for (var i = 0; i < digits.length; i++) {
+      if (i == 5) {
+        buffer.write('-');
+      }
+
+      buffer.write(digits[i]);
+    }
+
+    final formatted = buffer.toString();
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+      ) {
+    final upperText = newValue.text.toUpperCase();
+
+    return TextEditingValue(
+      text: upperText,
+      selection: newValue.selection,
     );
   }
 }
