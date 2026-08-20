@@ -12,7 +12,9 @@ import 'services/auth_service.dart';
 import 'services/cliente_service.dart';
 import 'services/produto_service.dart';
 import 'providers/pedido_provider.dart';
+import 'providers/tabela_venda_provider.dart';
 import 'services/pedido_service.dart';
+import 'services/tabela_venda_service.dart';
 import 'screens/home/home_screen.dart';
 
 void main() async {
@@ -29,6 +31,7 @@ void main() async {
         Provider<ClienteService>(create: (_) => ClienteService(dio)),
         Provider<ProdutoService>(create: (_) => ProdutoService(dio)),
         Provider<PedidoService>(create: (_) => PedidoService(dio)),
+        Provider<TabelaVendaService>(create: (_) => TabelaVendaService(dio)),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
             authService: context.read<AuthService>(),
@@ -47,6 +50,11 @@ void main() async {
           create: (context) =>
               PedidoProvider(pedidoService: context.read<PedidoService>()),
         ),
+        ChangeNotifierProvider<TabelaVendaProvider>(
+          create: (context) => TabelaVendaProvider(
+            tabelaVendaService: context.read<TabelaVendaService>(),
+          ),
+        ),
       ],
       child: BiscoitosKaueApp(tokenStorage: tokenStorage),
     ),
@@ -56,10 +64,7 @@ void main() async {
 class BiscoitosKaueApp extends StatelessWidget {
   final TokenStorage tokenStorage;
 
-  const BiscoitosKaueApp({
-    super.key,
-    required this.tokenStorage,
-  });
+  const BiscoitosKaueApp({super.key, required this.tokenStorage});
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ class Pedido {
   final String clienteNome;
   final int? usuarioId;
   final String? usuarioNome;
+  final String? nomeTabelaVenda;
   final String tipo;
   final String status;
   final String? observacao;
@@ -18,6 +19,7 @@ class Pedido {
     required this.clienteNome,
     this.usuarioId,
     this.usuarioNome,
+    this.nomeTabelaVenda,
     required this.tipo,
     required this.status,
     this.observacao,
@@ -36,6 +38,7 @@ class Pedido {
       clienteNome: _lerNomeCliente(json),
       usuarioId: json['usuarioId'],
       usuarioNome: json['nomeUsuario'],
+      nomeTabelaVenda: json['nomeTabelaVenda'],
       tipo: json['tipo'] ?? '',
       status: json['status'] ?? '',
       observacao: json['observacao'],

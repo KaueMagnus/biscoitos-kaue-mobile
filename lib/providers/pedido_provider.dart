@@ -65,6 +65,7 @@ class PedidoProvider extends ChangeNotifier {
 
   Future<bool> criarPedido({
     required int clienteId,
+    int? tabelaVendaId,
     required String tipo,
     required List<ItemPedidoRequest> itens,
     String? observacao,
@@ -77,6 +78,7 @@ class PedidoProvider extends ChangeNotifier {
     try {
       final pedido = PedidoRequest(
         clienteId: clienteId,
+        tabelaVendaId: tabelaVendaId,
         tipo: tipo,
         observacao: observacao,
         motivoTroca: motivoTroca,
@@ -95,11 +97,12 @@ class PedidoProvider extends ChangeNotifier {
       final data = error.response?.data;
 
       if (data is Map) {
-        _errorMessage = (data['message'] ??
-            data['error'] ??
-            data['detail'] ??
-            data.toString())
-            .toString();
+        _errorMessage =
+            (data['message'] ??
+                    data['error'] ??
+                    data['detail'] ??
+                    data.toString())
+                .toString();
       } else if (data != null) {
         _errorMessage = data.toString();
       } else {

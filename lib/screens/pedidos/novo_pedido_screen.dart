@@ -7,9 +7,11 @@ import '../../core/theme/app_theme.dart';
 import '../../models/cliente.dart';
 import '../../models/item_pedido_request.dart';
 import '../../models/produto.dart';
+import '../../models/tabela_venda.dart';
 import '../../providers/cliente_provider.dart';
 import '../../providers/pedido_provider.dart';
 import '../../providers/produto_provider.dart';
+import '../../providers/tabela_venda_provider.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/app_snack_bar.dart';
 import '../../widgets/primary_button.dart';
@@ -27,6 +29,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   final _motivoTrocaController = TextEditingController();
 
   Cliente? _clienteSelecionado;
+  TabelaVenda? _tabelaSelecionada;
   String _tipoPedido = 'NORMAL';
   final Map<int, int> _quantidades = {};
   final Map<int, TextEditingController> _quantidadeControllers = {};
@@ -37,9 +40,11 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
 
     final clienteProvider = context.read<ClienteProvider>();
     final produtoProvider = context.read<ProdutoProvider>();
+    final tabelaVendaProvider = context.read<TabelaVendaProvider>();
     Future.microtask(() async {
       await clienteProvider.carregarClientes();
       await produtoProvider.carregarProdutos();
+      await tabelaVendaProvider.carregarTabelasVenda();
     });
   }
 
@@ -68,7 +73,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   TextEditingController _controllerQuantidade(Produto produto) {
     return _quantidadeControllers.putIfAbsent(
       produto.id,
-          () => TextEditingController(
+      () => TextEditingController(
         text: _quantidades[produto.id]?.toString() ?? '',
       ),
     );
@@ -97,12 +102,16 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
     });
   }
 
+  double _precoProduto(Produto produto) {
+    return _tabelaSelecionada?.precoParaProduto(produto.id) ?? produto.preco;
+  }
+
   double _calcularTotal(List<Produto> produtos) {
     double total = 0;
 
     for (final produto in produtos) {
       final quantidade = _quantidades[produto.id] ?? 0;
-      total += produto.preco * quantidade;
+      total += _precoProduto(produto) * quantidade;
     }
 
     return total;
@@ -139,6 +148,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
 
     final sucesso = await pedidoProvider.criarPedido(
       clienteId: _clienteSelecionado!.id,
+      tabelaVendaId: _tabelaSelecionada?.id,
       tipo: _tipoPedido,
       observacao: _observacaoController.text.trim().isEmpty
           ? null
@@ -171,9 +181,13 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
     final clienteProvider = context.watch<ClienteProvider>();
     final produtoProvider = context.watch<ProdutoProvider>();
     final pedidoProvider = context.watch<PedidoProvider>();
+    final tabelaVendaProvider = context.watch<TabelaVendaProvider>();
 
     final carregandoDados =
-        clienteProvider.isLoading || produtoProvider.isLoading;
+        clienteProvider.isLoading ||
+        produtoProvider.isLoading ||
+        tabelaVendaProvider.isLoading;
+    final tabelasVenda = tabelaVendaProvider.tabelasVenda;
 
     final produtos = produtoProvider.produtos;
     final total = _calcularTotal(produtos);
@@ -211,6 +225,33 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                           });
                         },
                       ),
+                      if (tabelasVenda.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<TabelaVenda?>(
+                          initialValue: _tabelaSelecionada,
+                          decoration: const InputDecoration(
+                            labelText: 'Tabela de preço',
+                            prefixIcon: Icon(Icons.price_change_outlined),
+                          ),
+                          items: [
+                            const DropdownMenuItem<TabelaVenda?>(
+                              value: null,
+                              child: Text('Preço padrão'),
+                            ),
+                            ...tabelasVenda.map((tabela) {
+                              return DropdownMenuItem<TabelaVenda?>(
+                                value: tabela,
+                                child: Text(tabela.nome),
+                              );
+                            }),
+                          ],
+                          onChanged: (tabela) {
+                            setState(() {
+                              _tabelaSelecionada = tabela;
+                            });
+                          },
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         initialValue: _tipoPedido,
@@ -286,7 +327,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${produto.codigo} • ${formatarMoedaReal(produto.preco)}',
+                                  '${produto.codigo} • ${formatarMoedaReal(_precoProduto(produto))}',
                                   style: const TextStyle(
                                     color: AppTheme.supportGray,
                                   ),

@@ -2,6 +2,7 @@ import 'item_pedido_request.dart';
 
 class PedidoRequest {
   final int clienteId;
+  final int? tabelaVendaId;
   final String tipo;
   final String? observacao;
   final String? motivoTroca;
@@ -9,6 +10,7 @@ class PedidoRequest {
 
   PedidoRequest({
     required this.clienteId,
+    this.tabelaVendaId,
     required this.tipo,
     this.observacao,
     this.motivoTroca,
@@ -18,6 +20,7 @@ class PedidoRequest {
   Map<String, dynamic> toJson() {
     return {
       'clienteId': clienteId,
+      'tabelaVendaId': tabelaVendaId,
       'tipo': tipo,
       'observacao': observacao,
       'motivoTroca': motivoTroca,
