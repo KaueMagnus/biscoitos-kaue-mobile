@@ -45,6 +45,15 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
       await clienteProvider.carregarClientes();
       await produtoProvider.carregarProdutos();
       await tabelaVendaProvider.carregarTabelasVenda();
+
+      if (!mounted) return;
+
+      final tabelas = tabelaVendaProvider.tabelasVenda;
+      if (tabelas.length == 1) {
+        setState(() {
+          _tabelaSelecionada = tabelas.first;
+        });
+      }
     });
   }
 
