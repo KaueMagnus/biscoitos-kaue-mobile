@@ -123,7 +123,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                   items: [
                     const DropdownMenuItem<TabelaVenda?>(
                       value: null,
-                      child: Text('Preço padrão'),
+                      child: Text('Tabela Varejo'),
                     ),
                     ...tabelasVenda.map((tabela) {
                       return DropdownMenuItem<TabelaVenda?>(

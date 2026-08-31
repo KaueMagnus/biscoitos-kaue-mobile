@@ -257,7 +257,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                           items: [
                             const DropdownMenuItem<TabelaVenda?>(
                               value: null,
-                              child: Text('Preço padrão'),
+                              child: Text('Tabela Varejo'),
                             ),
                             ...tabelasVenda.map((tabela) {
                               return DropdownMenuItem<TabelaVenda?>(
