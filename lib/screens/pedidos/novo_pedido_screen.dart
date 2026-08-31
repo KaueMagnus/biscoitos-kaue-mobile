@@ -124,7 +124,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
       return precoFormatado;
     }
 
-    return '1cx = ${unidadesPorCaixa}un • $precoFormatado';
+    return 'cx = ${unidadesPorCaixa}un • $precoFormatado';
   }
 
   double _calcularTotal(List<Produto> produtos) {
