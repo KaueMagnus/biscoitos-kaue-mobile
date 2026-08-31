@@ -6,6 +6,7 @@ class Pedido {
   final String? usuarioNome;
   final String? nomeTabelaVenda;
   final String tipo;
+  final String? formaPagamento;
   final String status;
   final String? observacao;
   final String? motivoTroca;
@@ -21,6 +22,7 @@ class Pedido {
     this.usuarioNome,
     this.nomeTabelaVenda,
     required this.tipo,
+    this.formaPagamento,
     required this.status,
     this.observacao,
     this.motivoTroca,
@@ -40,6 +42,7 @@ class Pedido {
       usuarioNome: json['nomeUsuario'],
       nomeTabelaVenda: json['nomeTabelaVenda'],
       tipo: json['tipo'] ?? '',
+      formaPagamento: json['formaPagamento'],
       status: json['status'] ?? '',
       observacao: json['observacao'],
       motivoTroca: json['motivoTroca'],
