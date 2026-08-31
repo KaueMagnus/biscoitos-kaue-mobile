@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/unidades_por_caixa.dart';
 import '../../core/formatters/currency_formatter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/cliente.dart';
@@ -113,6 +114,17 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
 
   double _precoProduto(Produto produto) {
     return _tabelaSelecionada?.precoParaProduto(produto.id) ?? produto.preco;
+  }
+
+  String _detalheProduto(Produto produto) {
+    final precoFormatado = formatarMoedaReal(_precoProduto(produto));
+    final unidadesPorCaixa = unidadesPorCaixaPorCodigo(produto.codigo);
+
+    if (unidadesPorCaixa == null) {
+      return precoFormatado;
+    }
+
+    return '1cx = ${unidadesPorCaixa}un • $precoFormatado';
   }
 
   double _calcularTotal(List<Produto> produtos) {
@@ -336,7 +348,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${produto.codigo} • ${formatarMoedaReal(_precoProduto(produto))}',
+                                  _detalheProduto(produto),
                                   style: const TextStyle(
                                     color: AppTheme.supportGray,
                                   ),
