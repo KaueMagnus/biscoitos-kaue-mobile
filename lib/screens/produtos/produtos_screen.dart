@@ -20,6 +20,7 @@ class ProdutosScreen extends StatefulWidget {
 
 class _ProdutosScreenState extends State<ProdutosScreen> {
   final _buscaController = TextEditingController();
+  TabelaVenda? _tabelaSelecionada;
 
   @override
   void initState() {
@@ -27,9 +28,18 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
 
     final produtoProvider = context.read<ProdutoProvider>();
     final tabelaVendaProvider = context.read<TabelaVendaProvider>();
-    Future.microtask(() {
-      produtoProvider.carregarProdutos();
-      tabelaVendaProvider.carregarTabelasVenda();
+    Future.microtask(() async {
+      await produtoProvider.carregarProdutos();
+      await tabelaVendaProvider.carregarTabelasVenda();
+
+      if (!mounted) return;
+
+      final tabelas = tabelaVendaProvider.tabelasVenda;
+      if (tabelas.length == 1) {
+        setState(() {
+          _tabelaSelecionada = tabelas.first;
+        });
+      }
     });
   }
 
@@ -69,7 +79,6 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
         .toList();
 
     final tabelasVenda = tabelaVendaProvider.tabelasVenda;
-    final tabelaAtual = tabelasVenda.length == 1 ? tabelasVenda.first : null;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Produtos')),
@@ -103,6 +112,33 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                 ),
                 onChanged: (_) => _atualizarBusca(),
               ),
+              if (tabelasVenda.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                DropdownButtonFormField<TabelaVenda?>(
+                  initialValue: _tabelaSelecionada,
+                  decoration: const InputDecoration(
+                    labelText: 'Tabela de preço',
+                    prefixIcon: Icon(Icons.price_change_outlined),
+                  ),
+                  items: [
+                    const DropdownMenuItem<TabelaVenda?>(
+                      value: null,
+                      child: Text('Preço padrão'),
+                    ),
+                    ...tabelasVenda.map((tabela) {
+                      return DropdownMenuItem<TabelaVenda?>(
+                        value: tabela,
+                        child: Text(tabela.nome),
+                      );
+                    }),
+                  ],
+                  onChanged: (tabela) {
+                    setState(() {
+                      _tabelaSelecionada = tabela;
+                    });
+                  },
+                ),
+              ],
               const SizedBox(height: 12),
               if (produtosFiltrados.isEmpty)
                 const Padding(
@@ -165,7 +201,7 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                           ),
                           Text(
                             formatarMoedaReal(
-                              _precoProduto(produto, tabelaAtual),
+                              _precoProduto(produto, _tabelaSelecionada),
                             ),
                             style: const TextStyle(
                               color: AppTheme.primaryRed,
