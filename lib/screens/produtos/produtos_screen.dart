@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/unidades_por_caixa.dart';
 import '../../core/formatters/currency_formatter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/produto.dart';
+import '../../models/tabela_venda.dart';
 import '../../providers/produto_provider.dart';
+import '../../providers/tabela_venda_provider.dart';
 import '../../widgets/app_card.dart';
 import '../../widgets/section_title.dart';
 
@@ -23,8 +26,10 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     super.initState();
 
     final produtoProvider = context.read<ProdutoProvider>();
+    final tabelaVendaProvider = context.read<TabelaVendaProvider>();
     Future.microtask(() {
       produtoProvider.carregarProdutos();
+      tabelaVendaProvider.carregarTabelasVenda();
     });
   }
 
@@ -51,18 +56,26 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
     return nome.contains(busca) || codigo.contains(busca);
   }
 
+  double _precoProduto(Produto produto, TabelaVenda? tabela) {
+    return tabela?.precoParaProduto(produto.id) ?? produto.preco;
+  }
+
   @override
   Widget build(BuildContext context) {
     final produtoProvider = context.watch<ProdutoProvider>();
+    final tabelaVendaProvider = context.watch<TabelaVendaProvider>();
     final produtosFiltrados = produtoProvider.produtos
         .where(_produtoContemBusca)
         .toList();
+
+    final tabelasVenda = tabelaVendaProvider.tabelasVenda;
+    final tabelaAtual = tabelasVenda.length == 1 ? tabelasVenda.first : null;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Produtos')),
       body: Builder(
         builder: (_) {
-          if (produtoProvider.isLoading) {
+          if (produtoProvider.isLoading || tabelaVendaProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -98,6 +111,10 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                 )
               else
                 ...produtosFiltrados.map((produto) {
+                  final unidadesPorCaixa = unidadesPorCaixaPorCodigo(
+                    produto.codigo,
+                  );
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: AppCard(
@@ -127,6 +144,15 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                                     fontSize: 16,
                                   ),
                                 ),
+                                if (unidadesPorCaixa != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'cx = ${unidadesPorCaixa}un',
+                                    style: const TextStyle(
+                                      color: AppTheme.supportGray,
+                                    ),
+                                  ),
+                                ],
                                 const SizedBox(height: 4),
                                 Text(
                                   'Código ${produto.codigo}',
@@ -138,7 +164,9 @@ class _ProdutosScreenState extends State<ProdutosScreen> {
                             ),
                           ),
                           Text(
-                            formatarMoedaReal(produto.preco),
+                            formatarMoedaReal(
+                              _precoProduto(produto, tabelaAtual),
+                            ),
                             style: const TextStyle(
                               color: AppTheme.primaryRed,
                               fontWeight: FontWeight.bold,
