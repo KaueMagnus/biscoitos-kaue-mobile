@@ -30,7 +30,7 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   final _motivoTrocaController = TextEditingController();
 
   static const List<String> _formasPagamento = [
-    'Boleto a vista',
+    'Boleto à vista',
     'Boleto 28 dias',
   ];
 
