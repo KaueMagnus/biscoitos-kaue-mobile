@@ -4,6 +4,7 @@ class PedidoRequest {
   final int clienteId;
   final int? tabelaVendaId;
   final String tipo;
+  final String formaPagamento;
   final String? observacao;
   final String? motivoTroca;
   final List<ItemPedidoRequest> itens;
@@ -12,6 +13,7 @@ class PedidoRequest {
     required this.clienteId,
     this.tabelaVendaId,
     required this.tipo,
+    required this.formaPagamento,
     this.observacao,
     this.motivoTroca,
     required this.itens,
@@ -22,6 +24,7 @@ class PedidoRequest {
       'clienteId': clienteId,
       'tabelaVendaId': tabelaVendaId,
       'tipo': tipo,
+      'formaPagamento': formaPagamento,
       'observacao': observacao,
       'motivoTroca': motivoTroca,
       'itens': itens.map((item) => item.toJson()).toList(),

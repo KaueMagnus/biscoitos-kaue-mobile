@@ -186,6 +186,8 @@ class _ResumoPedidoCard extends StatelessWidget {
               _InfoPill(label: dataFormatada),
               if (pedido.nomeTabelaVenda != null)
                 _InfoPill(label: pedido.nomeTabelaVenda!),
+              if (pedido.formaPagamento != null)
+                _InfoPill(label: pedido.formaPagamento!),
             ],
           ),
           const SizedBox(height: 12),

@@ -29,9 +29,15 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
   final _observacaoController = TextEditingController();
   final _motivoTrocaController = TextEditingController();
 
+  static const List<String> _formasPagamento = [
+    'Boleto a vista',
+    'Boleto 28 dias',
+  ];
+
   Cliente? _clienteSelecionado;
   TabelaVenda? _tabelaSelecionada;
   String _tipoPedido = 'NORMAL';
+  String? _formaPagamentoSelecionada;
   final Map<int, int> _quantidades = {};
   final Map<int, TextEditingController> _quantidadeControllers = {};
 
@@ -165,12 +171,18 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
       return;
     }
 
+    if (_formaPagamentoSelecionada == null) {
+      _mostrarMensagem('Selecione a forma de pagamento.');
+      return;
+    }
+
     final pedidoProvider = context.read<PedidoProvider>();
 
     final sucesso = await pedidoProvider.criarPedido(
       clienteId: _clienteSelecionado!.id,
       tabelaVendaId: _tabelaSelecionada?.id,
       tipo: _tipoPedido,
+      formaPagamento: _formaPagamentoSelecionada!,
       observacao: _observacaoController.text.trim().isEmpty
           ? null
           : _observacaoController.text.trim(),
@@ -295,6 +307,25 @@ class _NovoPedidoScreenState extends State<NovoPedidoScreen> {
 
                           setState(() {
                             _tipoPedido = tipo;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        initialValue: _formaPagamentoSelecionada,
+                        decoration: const InputDecoration(
+                          labelText: 'Forma de pagamento',
+                          prefixIcon: Icon(Icons.payments_outlined),
+                        ),
+                        items: _formasPagamento.map((forma) {
+                          return DropdownMenuItem(
+                            value: forma,
+                            child: Text(forma),
+                          );
+                        }).toList(),
+                        onChanged: (forma) {
+                          setState(() {
+                            _formaPagamentoSelecionada = forma;
                           });
                         },
                       ),
